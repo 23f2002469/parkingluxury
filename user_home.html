@@ -1,0 +1,656 @@
+{% extends 'NavUser.html' %}
+
+{% block title %}SafeWheels{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    :root {
+        --luxury-cream: #f8f9fa;
+        --luxury-white: #ffffff;
+        --luxury-dark: #333333;
+        --luxury-gold: #d4af37;
+        --luxury-gold-dark: #b59f3b;
+        --luxury-silver: #b1b1b1;
+        --luxury-charcoal: #333333;
+        --font-primary: 'Noyh Slim R', sans-serif;
+        --font-secondary: 'Compita', sans-serif;
+        --shadow-light: 0 2px 4px rgba(0,0,0,0.04);
+        --shadow-dark: 0 4px 8px rgba(0,0,0,0.1);
+        --shadow-gold: 0 4px 8px rgba(212, 175, 55, 0.2);
+        --gold-gradient: linear-gradient(135deg, #d4af37 0%, #ffd700 100%);
+        --dark-gradient: linear-gradient(135deg, #333333 0%, #555555 100%);
+    }
+
+    .content-wrapper {
+        min-height: calc(100vh - 200px);
+        padding: 2rem;
+        background: var(--luxury-cream);
+    }
+
+    .dashboard-header {
+        background: var(--dark-gradient);
+        color: var(--luxury-white);
+        padding: 3rem 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 30% 70%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 70% 30%, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+        z-index: 0;
+    }
+
+    .dashboard-header::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gold-gradient);
+        z-index: 1;
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 2;
+        max-width: 1400px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .welcome-text h1 {
+        font-family: var(--font-primary);
+        font-weight: 700;
+        font-size: 2.5rem;
+        margin: 0 0 1rem 0;
+        background: var(--gold-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .welcome-text h1 i {
+        color: var(--luxury-gold);
+        font-size: 2rem;
+    }
+
+    .welcome-text p {
+        font-size: 1.2rem;
+        margin: 0;
+        font-family: var(--font-secondary);
+        color: var(--luxury-silver);
+    }
+
+    .dashboard-stats {
+        max-width: 1400px;
+        margin: 0 auto 2rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+    }
+
+    .stat-card {
+        background: var(--luxury-white);
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: var(--shadow-dark);
+        border: 1px solid rgba(212, 175, 55, 0.1);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-gold);
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gold-gradient);
+    }
+
+    .stat-card h3 {
+        font-family: var(--font-primary);
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--luxury-dark);
+        margin: 0 0 1.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .stat-card h3 i {
+        color: var(--luxury-gold);
+        font-size: 1.25rem;
+    }
+
+    .balance-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .balance-amount {
+        font-family: var(--font-primary);
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: var(--gold-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+    }
+
+    .add-money-form {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .form-input {
+        padding: 1rem 1.25rem;
+        border: 2px solid rgba(212, 175, 55, 0.2);
+        border-radius: 12px;
+        font-size: 1rem;
+        font-family: var(--font-secondary);
+        background: var(--luxury-cream);
+        color: var(--luxury-dark);
+        transition: all 0.3s ease;
+        min-width: 150px;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--luxury-gold);
+        box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+        background: var(--luxury-white);
+    }
+
+    .btn-primary {
+        background: var(--gold-gradient);
+        color: var(--luxury-white);
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-family: var(--font-secondary);
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-light);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-gold);
+    }
+
+    .main-content {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .section-title {
+        font-family: var(--font-primary);
+        font-weight: 600;
+        font-size: 2rem;
+        color: var(--luxury-dark);
+        margin: 2rem 0 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .section-title i {
+        color: var(--luxury-gold);
+        font-size: 1.5rem;
+    }
+
+    .table-container {
+        background: var(--luxury-white);
+        border-radius: 20px;
+        box-shadow: var(--shadow-dark);
+        overflow: hidden;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(212, 175, 55, 0.1);
+        position: relative;
+    }
+
+    .table-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gold-gradient);
+    }
+
+    .table-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: var(--font-secondary);
+        min-width: 800px;
+    }
+
+    th {
+        background: var(--luxury-charcoal);
+        color: var(--luxury-white);
+        padding: 1.5rem 2rem;
+        text-align: left;
+        font-family: var(--font-secondary);
+        font-weight: 600;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+        border-bottom: 3px solid var(--luxury-gold);
+    }
+
+    th i {
+        margin-right: 0.5rem;
+        color: var(--luxury-gold);
+    }
+
+    td {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        color: var(--luxury-dark);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    tbody tr:hover {
+        background: var(--luxury-cream);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(212, 175, 55, 0.1);
+    }
+
+    tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .btn-book {
+        background: var(--gold-gradient);
+        color: var(--luxury-white);
+        text-decoration: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: var(--shadow-light);
+    }
+
+    .btn-book:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-gold);
+        text-decoration: none;
+        color: var(--luxury-white);
+    }
+
+    .btn-release {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        color: var(--luxury-white);
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-light);
+    }
+
+    .btn-release:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3);
+    }
+
+    .alert {
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        font-size: 1rem;
+        font-family: var(--font-secondary);
+        border: 1px solid;
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+        color: #166534;
+        border-color: #86efac;
+    }
+
+    .alert-error {
+        background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+        color: #dc2626;
+        border-color: #fca5a5;
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--luxury-white);
+        border-radius: 20px;
+        box-shadow: var(--shadow-dark);
+        color: var(--luxury-charcoal);
+        border: 1px solid rgba(212, 175, 55, 0.1);
+        position: relative;
+    }
+
+    .no-data::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gold-gradient);
+    }
+
+    .no-data i {
+        font-size: 4rem;
+        color: var(--luxury-gold);
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .no-data h3 {
+        font-family: var(--font-primary);
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--luxury-dark);
+    }
+
+    .no-data p {
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    .table-scroll::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .table-scroll::-webkit-scrollbar-track {
+        background: var(--luxury-cream);
+    }
+
+    .table-scroll::-webkit-scrollbar-thumb {
+        background: var(--luxury-gold);
+        border-radius: 4px;
+    }
+
+    .table-scroll::-webkit-scrollbar-thumb:hover {
+        background: var(--luxury-gold-dark);
+    }
+
+    @media (max-width: 768px) {
+        .content-wrapper {
+            padding: 1rem;
+        }
+
+        .dashboard-header {
+            padding: 2rem 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-text h1 {
+            font-size: 2rem;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .dashboard-stats {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .stat-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .balance-amount {
+            font-size: 2rem;
+        }
+
+        .add-money-form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .form-input {
+            min-width: unset;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+        }
+
+        .table-container {
+            margin: 1rem 0;
+        }
+
+        th, td {
+            padding: 1rem;
+            font-size: 0.9rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="welcome-text">
+                <h1>
+                    <i class="fas fa-user-circle"></i>
+                    Welcome back, {{ user.name }}
+                </h1>
+                <p>Manage your parking spots and bookings with SafeWheels premium service</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <h3>
+                <i class="fas fa-wallet"></i>
+                Available Balance
+            </h3>
+            <div class="balance-section">
+                <span class="balance-amount">₹{{ "%5.2f"%(user.money) }}</span>
+                <form class="add-money-form" action="{{url_for('user_home',user_id=user.user_id)}}" method="POST">
+                    <input type="number" class="form-input" id="money" name="money" value="0" min="0" placeholder="Enter amount">
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Add Money
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        
+{% if bills_c %}
+        <!-- Current Bookings Section -->
+        <h2 class="section-title">
+            <i class="fas fa-clock"></i>
+            Current Bookings
+        </h2>
+        <div class="table-container">
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-receipt"></i> Bill ID</th>
+                            <th><i class="fas fa-calendar"></i> Date</th>
+                            <th><i class="fas fa-building"></i> Lot Name</th>
+                            <th><i class="fas fa-map-marker-alt"></i> Address</th>
+                            <th><i class="fas fa-map-pin"></i> Pin</th>
+                            <th><i class="fas fa-car"></i> Vehicle Number</th>
+                            <th><i class="fas fa-parking"></i> Spot ID</th>
+                            <th><i class="fas fa-clock"></i> Parked Time</th>
+                            <th><i class="fas fa-cog"></i> Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bill in bills_c %}
+                            {% if bill.settled==0 and bill.spot.status!=0 %}
+                            <tr>
+                                <td>{{ bill.bill_id }}</td>
+                                <td>{{ bill.date }}</td>
+                                <td>{{ bill.lot.name }}</td>
+                                <td>{{ bill.lot.address }}</td>
+                                <td>{{ bill.lot.pin }}</td>
+                                <td>{{ bill.vehicle_number }}</td>
+                                <td>{{ bill.spot.parkingspot_id }}</td>
+                                <td>{{ bill.start }}</td>
+                                <td>
+                                    <form action="{{url_for('bill',bill_id=bill.bill_id)}}" method="POST">
+                                        <input type="hidden" name="settled" value="1">
+                                        <button type="submit" class="btn-release">
+                                            <i class="fas fa-sign-out-alt"></i>
+                                            Release Spot
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+{% elif parklots %}
+        <!-- Available Parking Lots Section -->
+        <h2 class="section-title">
+            <i class="fas fa-parking"></i>
+            Available Parking Lots
+        </h2>
+        <div class="table-container">
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-building"></i> Lot Name</th>
+                            <th><i class="fas fa-map-pin"></i> Pin</th>
+                            <th><i class="fas fa-map-marker-alt"></i> Location</th>
+                            <th><i class="fas fa-rupee-sign"></i> Price/sec</th>
+                            <th><i class="fas fa-car-side"></i> Capacity</th>
+                            <th><i class="fas fa-check-circle"></i> Available</th>
+                            <th><i class="fas fa-cog"></i> Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for parklot in parklots %}
+                        <tr>
+                            <td>{{ parklot.name }}</td>
+                            <td>{{ parklot.pin }}</td>
+                            <td>{{ parklot.address }}</td>
+                            <td>₹{{ parklot.price }}</td>
+                            <td>{{ parklot.capacity }}</td>
+                            <td>{{ parklot.available }}</td>
+                            <td>
+                                <a href="{{ url_for('book', parklot_id=parklot.parklot_id,user_id=user.user_id) }}" class="btn-book">
+                                    <i class="fas fa-calendar-plus"></i>
+                                    Book Now
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+{% endif %}
+
+{% if bills_h %}
+        <!-- Booking History Section -->
+        <h2 class="section-title">
+            <i class="fas fa-history"></i>
+            Booking History
+        </h2>
+        <div class="table-container">
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-receipt"></i> Bill ID</th>
+                            <th><i class="fas fa-calendar"></i> Date</th>
+                            <th><i class="fas fa-building"></i> Lot Name</th>
+                            <th><i class="fas fa-map-marker-alt"></i> Address</th>
+                            <th><i class="fas fa-map-pin"></i> Pin</th>
+                            <th><i class="fas fa-car"></i> Vehicle Number</th>
+                            <th><i class="fas fa-rupee-sign"></i> Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bill in bills_h %}
+                            {% if bill.settled==1 %}
+                            <tr>
+                                <td>{{ bill.bill_id }}</td>
+                                <td>{{ bill.date }}</td>
+                                <td>{{ bill.lot.name }}</td>
+                                <td>{{ bill.lot.address }}</td>
+                                <td>{{ bill.lot.pin }}</td>
+                                <td>{{ bill.vehicle_number }}</td>
+                                <td>₹{{ bill.amount }}</td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+{% endif %}
+
+        {% if not bills_h and not bills_c and not parklots %}
+        <div class="no-data">
+            <i class="fas fa-parking"></i>
+            <h3>No Data Available</h3>
+            <p>No parking lots or bookings available at the moment.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

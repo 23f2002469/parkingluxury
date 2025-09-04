@@ -1,0 +1,436 @@
+{% extends 'AdminNav.html' %}
+
+{% block title %}User Management - SafeWheels{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .content-wrapper {
+        min-height: calc(100vh - 200px);
+        padding: 2rem;
+        background: var(--luxury-cream);
+    }
+
+    .dashboard-header {
+        background: var(--dark-gradient);
+        color: var(--luxury-white);
+        padding: 3rem 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 30% 70%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 70% 30%, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+        z-index: 0;
+    }
+
+    .dashboard-header::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gold-gradient);
+        z-index: 1;
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 2;
+        max-width: 1400px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .dashboard-title {
+        font-family: var(--font-primary);
+        font-weight: 700;
+        font-size: 2.5rem;
+        margin: 0 0 1rem 0;
+        background: var(--gold-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .dashboard-subtitle {
+        opacity: 0.9;
+        margin: 0;
+        font-size: 1.2rem;
+        font-family: var(--font-secondary);
+        color: var(--luxury-silver);
+    }
+
+    .users-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .table-container {
+        background: var(--luxury-white);
+        border-radius: 20px;
+        box-shadow: var(--shadow-dark);
+        overflow: hidden;
+        border: 1px solid rgba(212, 175, 55, 0.1);
+        position: relative;
+    }
+
+    .table-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gold-gradient);
+    }
+
+    .table-header {
+        padding: 2rem;
+        border-bottom: 2px solid rgba(212, 175, 55, 0.1);
+        background: var(--luxury-cream);
+    }
+
+    .table-title {
+        font-family: var(--font-primary);
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--luxury-dark);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .table-title i {
+        color: var(--luxury-gold);
+        font-size: 1.5rem;
+    }
+
+    .users-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: var(--font-secondary);
+    }
+
+    .users-table th {
+        background: var(--luxury-charcoal);
+        color: var(--luxury-white);
+        padding: 1.5rem 2rem;
+        text-align: left;
+        font-family: var(--font-secondary);
+        font-weight: 600;
+        font-size: 1rem;
+        letter-spacing: 0.5px;
+        border-bottom: 3px solid var(--luxury-gold);
+        position: relative;
+    }
+
+    .users-table th:first-child {
+        border-top-left-radius: 0;
+    }
+
+    .users-table th:last-child {
+        border-top-right-radius: 0;
+    }
+
+    .users-table th i {
+        margin-right: 0.5rem;
+        color: var(--luxury-gold);
+    }
+
+    .users-table td {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        color: var(--luxury-dark);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .users-table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .users-table tbody tr:hover {
+        background: var(--luxury-cream);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+    }
+
+    .users-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .user-name {
+        font-weight: 600;
+        color: var(--luxury-dark);
+    }
+
+    .user-email {
+        color: var(--luxury-charcoal);
+        font-style: italic;
+    }
+
+    .user-phone {
+        color: var(--luxury-charcoal);
+        font-family: monospace;
+        font-size: 0.95rem;
+    }
+
+    .user-status {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-active {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        color: var(--luxury-white);
+        box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--luxury-charcoal);
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: var(--luxury-gold);
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .empty-state h3 {
+        font-family: var(--font-primary);
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--luxury-dark);
+    }
+
+    .empty-state p {
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: var(--luxury-white);
+        padding: 2rem;
+        border-radius: 16px;
+        box-shadow: var(--shadow-light);
+        border: 1px solid rgba(212, 175, 55, 0.1);
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-gold);
+    }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        color: var(--luxury-gold);
+        margin-bottom: 1rem;
+    }
+
+    .stat-number {
+        font-family: var(--font-primary);
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--luxury-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--luxury-charcoal);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+        .content-wrapper {
+            padding: 1rem;
+        }
+
+        .dashboard-header {
+            padding: 2rem 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+        }
+
+        .table-header {
+            padding: 1.5rem;
+        }
+
+        .table-title {
+            font-size: 1.5rem;
+        }
+
+        .users-table th,
+        .users-table td {
+            padding: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .users-table {
+            min-width: 600px;
+        }
+    }
+
+    /* Responsive table scroll */
+    .table-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-scroll::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .table-scroll::-webkit-scrollbar-track {
+        background: var(--luxury-cream);
+    }
+
+    .table-scroll::-webkit-scrollbar-thumb {
+        background: var(--luxury-gold);
+        border-radius: 4px;
+    }
+
+    .table-scroll::-webkit-scrollbar-thumb:hover {
+        background: var(--luxury-gold-dark);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="dashboard-header">
+        <div class="header-content">
+            <h1 class="dashboard-title">
+                <i class="fas fa-users"></i>
+                User Management
+            </h1>
+            <p class="dashboard-subtitle">Manage and monitor all registered SafeWheels users</p>
+        </div>
+    </div>
+
+    <div class="users-container">
+        {% if users %}
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-number">{{ users|length }}</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <div class="stat-number">{{ users|length }}</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-car"></i>
+                </div>
+                <div class="stat-number">{{ users|length }}</div>
+                <div class="stat-label">Vehicle Owners</div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="table-container">
+            <div class="table-header">
+                <h2 class="table-title">
+                    <i class="fas fa-list"></i>
+                    Registered Users
+                </h2>
+            </div>
+
+            {% if users %}
+            <div class="table-scroll">
+                <table class="users-table" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-user"></i> Name</th>
+                            <th><i class="fas fa-envelope"></i> Email</th>
+                            <th><i class="fas fa-phone"></i> Phone</th>
+                            <th><i class="fas fa-calendar"></i> Date of Birth</th>
+                            <th> Gender</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td class="user-name">{{ user.name }}</td>
+                            <td class="user-email">{{ user.email }}</td>
+                            <td class="user-phone">{{ user.phone }}</td>
+                            <td>{{ user.dob }}</td>
+                            <td>
+                                <span class="user-status status-active">
+                                    
+                                    {{ user.gender }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-users-slash"></i>
+                <h3>No Users Found</h3>
+                <p>No users have registered for SafeWheels yet.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

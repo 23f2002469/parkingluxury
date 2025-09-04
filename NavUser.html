@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SafeWheels - Luxury Car Parking{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    {% block styles %}{% endblock %}
+    <style>
+        :root {
+            /* Luxury Color Palette */
+            --luxury-gold: #D4AF37;
+            --luxury-dark: #1a1a1a;
+            --luxury-charcoal: #2c2c2c;
+            --luxury-silver: #c0c0c0;
+            --luxury-white: #ffffff;
+            --luxury-cream: #f8f6f0;
+            --luxury-gold-light: #e6c757;
+            --luxury-gold-dark: #b8941f;
+            
+            /* Gradients */
+            --gold-gradient: linear-gradient(135deg, var(--luxury-gold) 0%, var(--luxury-gold-dark) 100%);
+            --dark-gradient: linear-gradient(135deg, var(--luxury-dark) 0%, var(--luxury-charcoal) 100%);
+            --glass-effect: rgba(255, 255, 255, 0.1);
+            
+            /* Typography */
+            --font-primary: 'Playfair Display', serif;
+            --font-secondary: 'Inter', sans-serif;
+            
+            /* Shadows */
+            --shadow-light: 0 4px 20px rgba(212, 175, 55, 0.15);
+            --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-gold: 0 4px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-secondary);
+            background: var(--luxury-dark);
+            color: var(--luxury-white);
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+                var(--luxury-dark);
+            z-index: -2;
+        }
+
+        /* Floating Particles Animation */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 1.5px;
+            height: 1.5px;
+            background: var(--luxury-gold);
+            border-radius: 50%;
+            animation: float 8s infinite linear;
+            opacity: 0.6;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-10px) translateX(20px) rotate(180deg);
+                opacity: 0;
+            }
+        }
+
+        /* Enhanced Flash Messages */
+        .flash-messages {
+            position: fixed;
+            top: 100px;
+            right: 2rem;
+            z-index: 2000;
+            max-width: 400px;
+        }
+
+        .flash-message {
+            margin-bottom: 1rem;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-dark);
+            animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%) scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .flash-content {
+            padding: 1.25rem 1.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(20px);
+            position: relative;
+        }
+
+        .flash-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .flash-success {
+            background: linear-gradient(135deg, rgba(5, 150, 105, 0.95) 0%, rgba(4, 120, 87, 0.95) 100%);
+            color: var(--luxury-white);
+        }
+
+        .flash-error {
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.95) 0%, rgba(185, 28, 28, 0.95) 100%);
+            color: var(--luxury-white);
+        }
+
+        .flash-warning {
+            background: linear-gradient(135deg, rgba(217, 119, 6, 0.95) 0%, rgba(180, 83, 9, 0.95) 100%);
+            color: var(--luxury-white);
+        }
+
+        .flash-info {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.95) 0%, rgba(184, 148, 31, 0.95) 100%);
+            color: var(--luxury-dark);
+        }
+
+        .flash-text {
+            font-weight: 500;
+            font-family: var(--font-secondary);
+            flex: 1;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .flash-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: inherit;
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            margin-left: 1rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .flash-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        /* Enhanced Navigation Styles */
+        .nav-container {
+            background: rgba(26, 26, 26, 0.98);
+            backdrop-filter: blur(25px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            padding: 1.25rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gold-gradient);
+            opacity: 0.8;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-family: var(--font-primary);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--luxury-gold);
+            text-decoration: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+        }
+
+        .nav-brand::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gold-gradient);
+            transition: width 0.4s ease;
+        }
+
+        .nav-brand:hover {
+            text-shadow: 0 0 25px rgba(212, 175, 55, 0.7);
+            transform: scale(1.05);
+        }
+
+        .nav-brand:hover::after {
+            width: 100%;
+        }
+
+        .nav-brand i {
+            font-size: 1.75rem;
+            transition: transform 0.4s ease;
+        }
+
+        .nav-brand:hover i {
+            transform: rotate(15deg);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.25rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--luxury-silver);
+            text-decoration: none;
+            font-family: var(--font-secondary);
+            font-weight: 500;
+            padding: 0.875rem 1.75rem;
+            border-radius: 50px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gold-gradient);
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+        }
+
+        .nav-link i {
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--luxury-dark);
+            border-color: var(--luxury-gold);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-gold);
+        }
+
+        .nav-link:hover::before {
+            left: 0;
+        }
+
+        .nav-link:hover i {
+            transform: scale(1.2);
+        }
+
+        .nav-link-logout {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: var(--luxury-white);
+            border: 1px solid #dc2626;
+        }
+
+        .nav-link-logout::before {
+            background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+        }
+
+        .nav-link-logout:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+            color: var(--luxury-white);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
+        }
+
+        /* Enhanced Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid var(--luxury-gold);
+            color: var(--luxury-gold);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.75rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .mobile-menu-toggle:hover {
+            background: rgba(212, 175, 55, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* Enhanced Footer */
+        .footer {
+            background: linear-gradient(135deg, var(--luxury-charcoal) 0%, var(--luxury-dark) 100%);
+            border-top: 1px solid rgba(212, 175, 55, 0.3);
+            padding: 4rem 2rem 2rem;
+            margin-top: 4rem;
+            position: relative;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gold-gradient);
+            opacity: 0.8;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .footer-logo {
+            font-family: var(--font-primary);
+            font-weight: 600;
+            color: var(--luxury-gold);
+            text-decoration: none;
+            font-size: 1.75rem;
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-logo:hover {
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.7);
+            transform: scale(1.05);
+        }
+
+        .footer-logo i {
+            transition: transform 0.4s ease;
+        }
+
+        .footer-logo:hover i {
+            transform: rotate(15deg);
+        }
+
+        .footer-tagline {
+            color: var(--luxury-silver);
+            font-size: 1rem;
+            font-style: italic;
+            font-family: var(--font-secondary);
+        }
+
+        .footer-info {
+            text-align: right;
+        }
+
+        .copyright {
+            color: var(--luxury-silver);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            font-family: var(--font-secondary);
+        }
+
+        .footer-note {
+            color: var(--luxury-gold);
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: var(--font-secondary);
+        }
+
+        /* Enhanced Responsive Design */
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 1rem 1.5rem;
+            }
+
+            .nav-content {
+                position: relative;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                position: absolute;
+                top: calc(100% + 1px);
+                left: -1.5rem;
+                right: -1.5rem;
+                background: rgba(26, 26, 26, 0.98);
+                backdrop-filter: blur(25px);
+                flex-direction: column;
+                padding: 1.5rem;
+                gap: 1rem;
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                border-top: 1px solid rgba(212, 175, 55, 0.3);
+                border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            }
+
+            .nav-links.active {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .nav-link {
+                width: 100%;
+                text-align: center;
+                padding: 1.25rem;
+                justify-content: center;
+                border-radius: 12px;
+            }
+
+            .nav-brand {
+                font-size: 1.75rem;
+            }
+
+            .flash-messages {
+                right: 1rem;
+                left: 1rem;
+                max-width: none;
+                top: 80px;
+            }
+
+            .footer {
+                padding: 3rem 1.5rem 2rem;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 2rem;
+            }
+
+            .footer-info {
+                text-align: center;
+            }
+        }
+
+        /* Enhanced Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--luxury-dark) 0%, var(--luxury-charcoal) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(212, 175, 55, 0.2);
+            border-top: 4px solid var(--luxury-gold);
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Content Area */
+        #content {
+            min-height: calc(100vh - 200px);
+            padding: 2rem 0;
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--luxury-charcoal);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--luxury-gold);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--luxury-gold-dark);
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Particles -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <nav class="nav-container">
+        <div class="nav-content">
+            <a href="{{url_for('user_home',user_id=user.user_id)}}" class="nav-brand">
+                <i class="fas fa-car"></i>SafeWheels
+            </a>
+            <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-links" id="navLinks">
+                <a href="{{url_for('user_home',user_id=user.user_id)}}" class="nav-link">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="{{url_for('summary')}}" class="nav-link">
+                    <i class="fas fa-chart-line"></i> Summary
+                </a>
+                <a href="{{url_for('edit',user_id=user.user_id)}}" class="nav-link">
+                    <i class="fas fa-user-edit"></i> Edit Profile
+                </a>
+                <a href="{{url_for('logout')}}" class="nav-link nav-link-logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">
+                        <div class="flash-content">
+                            <span class="flash-text">{{ message }}</span>
+                            <button class="flash-close" onclick="this.parentElement.parentElement.style.display='none'">&times;</button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+    {% block nav %}{% endblock %}
+    <div id="content">{% block content %}{% endblock %}</div>
+    
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="#" class="footer-logo">
+                    <i class="fas fa-car"></i> SafeWheels
+                </a>
+                <p class="footer-tagline">Premium Luxury Car Parking Solutions</p>
+            </div>
+            <div class="footer-info">
+                <p class="copyright">&copy; 2025 SafeWheels. All rights reserved.</p>
+                <p class="footer-note">MAD1 Project - Luxury Edition</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Optimized particle creation
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = window.innerWidth < 768 ? 25 : 40; // Fewer particles on mobile
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 6) + 's';
+                particle.style.opacity = Math.random() * 0.4 + 0.2;
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Enhanced mobile menu toggle
+        function toggleMobileMenu() {
+            const navLinks = document.getElementById('navLinks');
+            const toggle = document.querySelector('.mobile-menu-toggle i');
+            
+            navLinks.classList.toggle('active');
+            
+            if (navLinks.classList.contains('active')) {
+                toggle.classList.remove('fa-bars');
+                toggle.classList.add('fa-times');
+            } else {
+                toggle.classList.remove('fa-times');
+                toggle.classList.add('fa-bars');
+            }
+        }
+
+        // Enhanced loading overlay with smooth transitions
+        function showLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.style.opacity = '1';
+            overlay.style.visibility = 'visible';
+        }
+
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.style.opacity = '0';
+            overlay.style.visibility = 'hidden';
+        }
+
+        // Enhanced auto-hide flash messages with smooth animations
+        function autoHideFlashMessages() {
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach((message, index) => {
+                setTimeout(() => {
+                    message.style.opacity = '0';
+                    message.style.transform = 'translateX(100%) scale(0.9)';
+                    setTimeout(() => {
+                        message.remove();
+                    }, 400);
+                }, 5000 + (index * 500)); // Stagger the hiding
+            });
+        }
+
+        // Enhanced smooth navigation transitions
+        document.querySelectorAll('.nav-link:not(.nav-link-logout)').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (this.href && !this.href.includes('#')) {
+                    e.preventDefault();
+                    showLoading();
+                    
+                    // Add a subtle delay for better UX
+                    setTimeout(() => {
+                        window.location.href = this.href;
+                    }, 400);
+                }
+            });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const navLinks = document.getElementById('navLinks');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (!navLinks.contains(e.target) && !toggle.contains(e.target) && navLinks.classList.contains('active')) {
+                toggleMobileMenu();
+            }
+        });
+
+        // Enhanced scroll behavior for navigation
+        let lastScrollTop = 0;
+        const nav = document.querySelector('.nav-container');
+        
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > lastScrollTop && scrollTop > 100) {
+                // Scrolling down
+                nav.style.transform = 'translateY(-100%)';
+            } else {
+                // Scrolling up
+                nav.style.transform = 'translateY(0)';
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+
+        // Initialize on page load with enhanced timing
+        document.addEventListener('DOMContentLoaded', function() {
+            // Stagger initialization for smoother loading
+            setTimeout(() => createParticles(), 100);
+            setTimeout(() => autoHideFlashMessages(), 200);
+            setTimeout(() => hideLoading(), 300);
+        });
+
+        // Handle page transitions with better timing
+        window.addEventListener('beforeunload', function() {
+            showLoading();
+        });
+
+        // Performance optimization: Pause particles when tab is not visible
+        document.addEventListener('visibilitychange', function() {
+            const particles = document.querySelectorAll('.particle');
+            if (document.hidden) {
+                particles.forEach(particle => {
+                    particle.style.animationPlayState = 'paused';
+                });
+            } else {
+                particles.forEach(particle => {
+                    particle.style.animationPlayState = 'running';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

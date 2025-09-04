@@ -1,0 +1,569 @@
+{% extends 'AdminNav.html' %}
+
+{% block title %}Revenue Summary - SafeWheels{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .content-wrapper {
+        min-height: calc(100vh - 200px);
+        padding: 2rem;
+        background: var(--luxury-cream);
+    }
+
+    .dashboard-header {
+        background: var(--dark-gradient);
+        color: var(--luxury-white);
+        padding: 3rem 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 30% 70%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 70% 30%, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+        z-index: 0;
+    }
+
+    .dashboard-header::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gold-gradient);
+        z-index: 1;
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 2;
+        max-width: 1400px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .dashboard-title {
+        font-family: var(--font-primary);
+        font-weight: 700;
+        font-size: 2.5rem;
+        margin: 0 0 1rem 0;
+        background: var(--gold-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .dashboard-title i {
+        color: var(--luxury-gold);
+        font-size: 2rem;
+    }
+
+    .dashboard-subtitle {
+        margin: 0;
+        font-size: 1.2rem;
+        font-family: var(--font-secondary);
+        color: var(--luxury-silver);
+    }
+
+    .stats-container {
+        max-width: 1400px;
+        margin: 0 auto 2rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .stat-card {
+        background: var(--luxury-white);
+        border-radius: 20px;
+        padding: 2.5rem 2rem;
+        box-shadow: var(--shadow-dark);
+        border: 1px solid rgba(212, 175, 55, 0.1);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-gold);
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gold-gradient);
+    }
+
+    .stat-icon {
+        font-size: 3rem;
+        color: var(--luxury-gold);
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .stat-title {
+        color: var(--luxury-charcoal);
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0 0 1rem 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-family: var(--font-secondary);
+    }
+
+    .stat-value {
+        font-family: var(--font-primary);
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--luxury-dark);
+        margin: 0;
+        background: var(--gold-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .charts-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .chart-section {
+        background: var(--luxury-white);
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-dark);
+        border: 1px solid rgba(212, 175, 55, 0.1);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .chart-section:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-gold);
+    }
+
+    .chart-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gold-gradient);
+    }
+
+    .chart-title {
+        font-family: var(--font-primary);
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--luxury-dark);
+        margin: 0 0 2rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .chart-title i {
+        color: var(--luxury-gold);
+        font-size: 1.5rem;
+    }
+
+    .chart-image {
+        width: 100%;
+        height: auto;
+        border-radius: 16px;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .chart-image:hover {
+        transform: scale(1.02);
+        box-shadow: 0 12px 48px rgba(212, 175, 55, 0.2);
+    }
+
+    .chart-description {
+        color: var(--luxury-charcoal);
+        font-size: 1.1rem;
+        margin: 0;
+        font-family: var(--font-secondary);
+        font-style: italic;
+        text-align: center;
+    }
+
+    .revenue-insights {
+        background: var(--luxury-charcoal);
+        color: var(--luxury-white);
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-top: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .revenue-insights::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gold-gradient);
+    }
+
+    .insights-title {
+        font-family: var(--font-primary);
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin: 0 0 1.5rem 0;
+        color: var(--luxury-gold);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .insights-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .insight-item {
+        background: rgba(212, 175, 55, 0.1);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .insight-label {
+        font-size: 0.9rem;
+        color: var(--luxury-silver);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .insight-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--luxury-gold);
+        font-family: var(--font-primary);
+    }
+
+    @media (max-width: 768px) {
+        .content-wrapper {
+            padding: 1rem;
+        }
+
+        .dashboard-header {
+            padding: 2rem 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .stats-container {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .stat-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+        }
+
+        .chart-section {
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+        }
+
+        .revenue-insights {
+            padding: 1.5rem;
+        }
+
+        .insights-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="dashboard-header">
+        <div class="header-content">
+            <h1 class="dashboard-title">
+                <i class="fas fa-chart-line"></i>
+                Revenue Dashboard
+            </h1>
+            <p class="dashboard-subtitle">Comprehensive overview of SafeWheels sales and revenue performance</p>
+        </div>
+    </div>
+
+   
+        <div class="stats-container">
+        <div class="stat-card">
+            <i class="fas fa-rupee-sign stat-icon"></i>
+            <h3 class="stat-title">Total Revenue</h3>
+            <p class="stat-value" data-target="{{ totalrevenue }}" data-prefix="₹">₹0.00</p>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-shopping-cart stat-icon"></i>
+            <h3 class="stat-title">Total Sales</h3>
+            <p class="stat-value" data-target="{{ totalsales }}">0</p>
+        </div>
+    </div>
+
+    <div class="revenue-insights">
+        <h3 class="insights-title">
+            <i class="fas fa-lightbulb"></i>
+            Performance Insights
+        </h3>
+        <div class="insights-grid">
+            <div class="insight-item">
+                <div class="insight-label">Average Revenue per Sale</div>
+                <div class="insight-value" data-target="{{ totalrevenue / totalsales if totalsales > 0 else 0 }}" data-prefix="₹">₹0.00</div>
+            </div>
+            <div class="insight-item">
+                <div class="insight-label">Revenue Growth</div>
+                <div class="insight-value" data-target="12.5" data-suffix="%">0%</div>
+            </div>
+            <div class="insight-item">
+                <div class="insight-label">Active Parking Lots</div>
+                <div class="insight-value" data-target="{{ totalsales }}">0</div>
+            </div>
+        </div>
+    </div>
+    <div class="stats-container">
+        
+
+    <div class="charts-container">
+        <div class="chart-section">
+            <h3 class="chart-title">
+                <i class="fas fa-user-chart"></i>
+                Revenue by User
+            </h3>
+            <img src="/Revenuevsuser.png/" alt="Revenue by User Chart" class="chart-image">
+            <p class="chart-description">Distribution of revenue across different SafeWheels users</p>
+        </div>
+
+        <div class="chart-section">
+            <h3 class="chart-title">
+                <i class="fas fa-parking"></i>
+                Revenue by Parking Lot
+            </h3>
+            <img src="/Revenuevslot.png/" alt="Revenue by Parking Lot Chart" class="chart-image">
+            <p class="chart-description">Revenue distribution across different parking locations</p>
+        </div>
+
+        <div class="chart-section">
+            <h3 class="chart-title">
+                <i class="fas fa-chart-bar"></i>
+                Sales per Parking Lot
+            </h3>
+            <img src="/Salesperlot.png/" alt="Sales per Parking Lot Chart" class="chart-image">
+            <p class="chart-description">Number of bookings and transactions per parking facility</p>
+        </div>
+
+        
+    </div>
+</div>
+</div>
+
+<script>
+// Animated Number Counter Function
+function animateNumber(element, target, duration = 3000, prefix = '', suffix = '') {
+    const start = 0;
+    const increment = target / (duration / 16); // 60 FPS
+    let current = start;
+    
+    const timer = setInterval(() => {
+        current += increment;
+        
+        if (current >= target) {
+            current = target;
+            clearInterval(timer);
+        }
+        
+        // Format number based on type
+        let displayValue;
+        if (prefix === '₹') {
+            // Format currency with commas and 2 decimal places
+            displayValue = prefix + current.toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        } else if (suffix === '%') {
+            // Format percentage with 1 decimal place
+            displayValue = current.toFixed(1) + suffix;
+        } else {
+            // Format regular numbers with commas
+            displayValue = Math.floor(current).toLocaleString('en-IN') + suffix;
+        }
+        
+        element.textContent = displayValue;
+    }, 16);
+}
+
+// Intersection Observer for triggering animations when elements come into view
+const observerOptions = {
+    threshold: 0.3,
+    rootMargin: '0px 0px -20px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting && !entry.target.classList.contains('animated')) {
+            entry.target.classList.add('animated');
+            
+            const target = parseFloat(entry.target.dataset.target);
+            const prefix = entry.target.dataset.prefix || '';
+            const suffix = entry.target.dataset.suffix || '';
+            
+            // Add a slight delay for staggered animation effect
+            const delay = Array.from(entry.target.parentElement.children).indexOf(entry.target) * 150;
+            
+            setTimeout(() => {
+                animateNumber(entry.target, target, 3500, prefix, suffix);
+            }, delay);
+        }
+    });
+}, observerOptions);
+
+// Initialize animations when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Add CSS animation classes
+    const style = document.createElement('style');
+    style.textContent = `
+        .stat-value, .insight-value {
+            transition: all 0.4s ease;
+        }
+        
+        .stat-card, .insight-item {
+            opacity: 0;
+            transform: translateY(15px);
+            animation: fadeInUp 1.2s ease forwards;
+        }
+        
+        .stat-card:nth-child(1) { animation-delay: 0.2s; }
+        .stat-card:nth-child(2) { animation-delay: 0.4s; }
+        
+        .insight-item:nth-child(1) { animation-delay: 0.6s; }
+        .insight-item:nth-child(2) { animation-delay: 0.8s; }
+        .insight-item:nth-child(3) { animation-delay: 1.0s; }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .number-highlight {
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-card:hover .stat-value,
+        .insight-item:hover .insight-value {
+            transform: scale(1.02);
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Observe all elements with data-target attribute
+    const animatedElements = document.querySelectorAll('[data-target]');
+    animatedElements.forEach(element => {
+        observer.observe(element);
+        element.classList.add('number-highlight');
+    });
+    
+    // Add floating particles animation to dashboard header
+    createFloatingParticles();
+});
+
+// Floating particles animation for dashboard header
+function createFloatingParticles() {
+    const header = document.querySelector('.dashboard-header');
+    if (!header) return;
+    
+    for (let i = 0; i < 6; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'floating-particle';
+        particle.style.cssText = `
+            position: absolute;
+            width: ${Math.random() * 2 + 1}px;
+            height: ${Math.random() * 2 + 1}px;
+            background: var(--luxury-gold);
+            border-radius: 50%;
+            opacity: ${Math.random() * 0.2 + 0.1};
+            left: ${Math.random() * 100}%;
+            top: ${Math.random() * 100}%;
+            animation: float ${Math.random() * 4 + 6}s ease-in-out infinite;
+            animation-delay: ${Math.random() * 3}s;
+            pointer-events: none;
+            z-index: 1;
+        `;
+        header.appendChild(particle);
+    }
+    
+    // Add floating animation keyframes
+    const floatingStyle = document.createElement('style');
+    floatingStyle.textContent = `
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) translateX(0px);
+            }
+            25% {
+                transform: translateY(-5px) translateX(2px);
+            }
+            50% {
+                transform: translateY(-8px) translateX(-2px);
+            }
+            75% {
+                transform: translateY(-3px) translateX(1px);
+            }
+        }
+    `;
+    document.head.appendChild(floatingStyle);
+}
+</script>
+{% endblock %}

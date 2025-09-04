@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking Receipt - SafeWheels</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    :root {
+        /* Luxury Color Palette */
+        --luxury-gold: #D4AF37;
+        --luxury-dark: #1a1a1a;
+        --luxury-charcoal: #2c2c2c;
+        --luxury-silver: #c0c0c0;
+        --luxury-white: #ffffff;
+        --luxury-cream: #f8f6f0;
+        
+        /* Typography */
+        --font-primary: 'Playfair Display', serif;
+        --font-secondary: 'Inter', sans-serif;
+        
+        /* Gradients */
+        --gold-gradient: linear-gradient(135deg, #D4AF37 0%, #F4E37D 100%);
+        --dark-gradient: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+        
+        /* Shadows */
+        --shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.12);
+        --shadow-gold: 0 8px 32px rgba(212, 175, 55, 0.25);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: var(--font-secondary);
+        background: var(--luxury-cream);
+        min-height: 100vh;
+        color: var(--luxury-dark);
+        line-height: 1.6;
+    }
+
+    /* Flash Messages Styling */
+    .flash-messages {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 400px;
+    }
+
+    .alert {
+        padding: 1rem 1.5rem;
+        border-radius: 16px;
+        color: var(--luxury-white);
+        box-shadow: var(--shadow-dark);
+        animation: slideInRight 0.5s ease-out;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
+    }
+
+    .alert::before {
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        font-size: 1.1rem;
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.9), rgba(21, 128, 61, 0.9));
+    }
+
+    .alert-success::before {
+        content: '\f058';
+    }
+
+    .alert-error {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(185, 28, 28, 0.9));
+    }
+
+    .alert-error::before {
+        content: '\f06a';
+    }
+
+    .alert-warning {
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(217, 119, 6, 0.9));
+    }
+
+    .alert-warning::before {
+        content: '\f071';
+    }
+
+    .alert-info {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.9), rgba(180, 147, 47, 0.9));
+    }
+
+    .alert-info::before {
+        content: '\f05a';
+    }
+
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .bill-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem;
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .thank-you-section {
+        background: var(--dark-gradient);
+        color: var(--luxury-white);
+        padding: 4rem 3rem;
+        border-radius: 24px;
+        text-align: center;
+        margin-bottom: 3rem;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    .thank-you-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 30% 70%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 70% 30%, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+        z-index: 0;
+    }
+
+    .thank-you-section::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gold-gradient);
+        z-index: 1;
+    }
+
+    .thank-you-content {
+        position: relative;
+        z-index: 2;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .thank-you-icon {
+        font-size: 4rem;
+        color: var(--luxury-gold);
+        margin-bottom: 1.5rem;
+        display: block;
+    }
+
+    .thank-you-title {
+        font-family: var(--font-primary);
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        background: var(--gold-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .thank-you-text {
+        font-size: 1.3rem;
+        color: var(--luxury-silver);
+        margin-bottom: 1rem;
+        line-height: 1.6;
+    }
+
+    .support-link {
+        color: var(--luxury-gold);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .support-link:hover {
+        color: var(--luxury-white);
+        transform: translateY(-2px);
+    }
+
+    .bill-card {
+        background: var(--luxury-white);
+        border-radius: 24px;
+        box-shadow: var(--shadow-dark);
+        padding: 3rem;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .bill-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gold-gradient);
+        z-index: 1;
+    }
+
+    .bill-header {
+        border-bottom: 2px solid rgba(212, 175, 55, 0.1);
+        padding-bottom: 2rem;
+        margin-bottom: 2.5rem;
+        text-align: center;
+    }
+
+    .bill-title {
+        font-family: var(--font-primary);
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--luxury-dark);
+        margin: 0 0 0.5rem 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .bill-title i {
+        color: var(--luxury-gold);
+        font-size: 1.75rem;
+    }
+
+    .bill-subtitle {
+        color: var(--luxury-charcoal);
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    .bill-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .bill-section {
+        background: rgba(212, 175, 55, 0.05);
+        padding: 2rem;
+        border-radius: 16px;
+        border: 1px solid rgba(212, 175, 55, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .bill-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(212, 175, 55, 0.15);
+    }
+
+    .bill-section-title {
+        font-family: var(--font-primary);
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: var(--luxury-dark);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .bill-section-title i {
+        color: var(--luxury-gold);
+        font-size: 1.25rem;
+    }
+
+    .bill-item {
+        margin-bottom: 1.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+    }
+
+    .bill-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+    .bill-label {
+        font-size: 1rem;
+        color: var(--luxury-charcoal);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .bill-label i {
+        color: var(--luxury-gold);
+        font-size: 0.9rem;
+        width: 16px;
+    }
+
+    .bill-value {
+        font-family: var(--font-secondary);
+        color: var(--luxury-dark);
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .bill-total {
+        background: var(--dark-gradient);
+        color: var(--luxury-white);
+        padding: 2rem;
+        border-radius: 16px;
+        margin-bottom: 2.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .bill-total::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--gold-gradient);
+    }
+
+    .total-label {
+        font-family: var(--font-primary);
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--luxury-silver);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .total-label i {
+        color: var(--luxury-gold);
+        font-size: 1.25rem;
+    }
+
+    .total-amount {
+        font-family: var(--font-primary);
+        font-size: 2rem;
+        font-weight: 700;
+        background: var(--gold-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        padding: 1.25rem 2.5rem;
+        background: var(--gold-gradient);
+        color: var(--luxury-white);
+        text-decoration: none;
+        border-radius: 16px;
+        font-family: var(--font-primary);
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--shadow-dark);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        width: 100%;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-back::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-back:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-gold);
+    }
+
+    .btn-back:hover::before {
+        left: 100%;
+    }
+
+    .btn-back i {
+        font-size: 1.1rem;
+    }
+
+    .print-section {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    .btn-print {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: transparent;
+        color: var(--luxury-charcoal);
+        border: 2px solid rgba(212, 175, 55, 0.3);
+        border-radius: 12px;
+        font-family: var(--font-secondary);
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        margin-right: 1rem;
+    }
+
+    .btn-print:hover {
+        background: rgba(212, 175, 55, 0.1);
+        border-color: var(--luxury-gold);
+        color: var(--luxury-dark);
+    }
+
+    @media (max-width: 768px) {
+        .bill-container {
+            padding: 1rem;
+        }
+
+        .thank-you-section {
+            padding: 3rem 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .thank-you-icon {
+            font-size: 3rem;
+        }
+
+        .thank-you-title {
+            font-size: 2rem;
+        }
+
+        .thank-you-text {
+            font-size: 1.1rem;
+        }
+
+        .bill-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .bill-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .bill-section {
+            padding: 1.5rem;
+        }
+
+        .bill-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .bill-value {
+            text-align: left;
+        }
+
+        .bill-total {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .total-amount {
+            font-size: 1.75rem;
+        }
+
+        .btn-back {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+        }
+
+        .print-section {
+            margin-top: 1.5rem;
+        }
+
+        .btn-print {
+            margin-right: 0;
+            margin-bottom: 1rem;
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .thank-you-section {
+            padding: 2rem 1.5rem;
+        }
+
+        .thank-you-title {
+            font-size: 1.75rem;
+        }
+
+        .bill-card {
+            padding: 1.5rem 1rem;
+        }
+
+        .bill-title {
+            font-size: 1.5rem;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+
+    @media print {
+        .btn-back,
+        .print-section,
+        .flash-messages {
+            display: none !important;
+        }
+
+        .bill-container {
+            max-width: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .thank-you-section,
+        .bill-card {
+            box-shadow: none;
+            border: 1px solid #ddd;
+        }
+    }
+</style>
+</head>
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="bill-container">
+        <section class="thank-you-section">
+            <div class="thank-you-content">
+                <i class="fas fa-check-circle thank-you-icon"></i>
+                <h1 class="thank-you-title">Thank You for Choosing SafeWheels</h1>
+                <p class="thank-you-text">We hope you had a safe and secure parking experience with us. Your trust in SafeWheels means everything to us.</p>
+                <a href="#" class="support-link">
+                    <i class="fas fa-headset"></i>
+                    Need support? Contact us
+                </a>
+            </div>
+        </section>
+
+        <div class="bill-card">
+            <div class="bill-header">
+                <h2 class="bill-title">
+                    <i class="fas fa-receipt"></i>
+                    Parking Receipt
+                </h2>
+                <p class="bill-subtitle">Official payment confirmation for your parking session</p>
+            </div>
+
+            <div class="bill-grid">
+                <div class="bill-section">
+                    <h3 class="bill-section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Booking Details
+                    </h3>
+                    <div class="bill-item">
+                        <div class="bill-label">
+                            <i class="fas fa-hashtag"></i>
+                            Bill ID
+                        </div>
+                        <div class="bill-value">{{ bill.bill_id }}</div>
+                    </div>
+                    <div class="bill-item">
+                        <div class="bill-label">
+                            <i class="fas fa-calendar"></i>
+                            Date
+                        </div>
+                        <div class="bill-value">{{ bill.date }}</div>
+                    </div>
+                    <div class="bill-item">
+                        <div class="bill-label">
+                            <i class="fas fa-car"></i>
+                            Vehicle Number
+                        </div>
+                        <div class="bill-value">{{ bill.vehicle_number }}</div>
+                    </div>
+                    <div class="bill-item">
+                        <div class="bill-label">
+                            <i class="fas fa-clock"></i>
+                            Duration
+                        </div>
+                        <div class="bill-value">{{ bill.start }}</div>
+                    </div>
+                </div>
+
+                <div class="bill-section">
+                    <h3 class="bill-section-title">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Parking Location
+                    </h3>
+                    <div class="bill-item">
+                        <div class="bill-label">
+                            <i class="fas fa-building"></i>
+                            Parking Lot
+                        </div>
+                        <div class="bill-value">{{ bill.lot.name }}</div>
+                    </div>
+                    <div class="bill-item">
+                        <div class="bill-label">
+                            <i class="fas fa-map"></i>
+                            Address
+                        </div>
+                        <div class="bill-value">{{ bill.lot.address }}</div>
+                    </div>
+                    <div class="bill-item">
+                        <div class="bill-label">
+                            <i class="fas fa-map-pin"></i>
+                            PIN Code
+                        </div>
+                        <div class="bill-value">{{ bill.lot.pin }}</div>
+                    </div>
+                    <div class="bill-item">
+                        <div class="bill-label">
+                            <i class="fas fa-parking"></i>
+                            Spot Number
+                        </div>
+                        <div class="bill-value">{{ bill.parkingspot_id }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bill-total">
+                <span class="total-label">
+                    <i class="fas fa-rupee-sign"></i>
+                    Total Amount
+                </span>
+                <span class="total-amount">₹{{ bill.amount }}</span>
+            </div>
+
+            <div class="print-section">
+                <a href="javascript:window.print()" class="btn-print">
+                    <i class="fas fa-print"></i>
+                    Print Receipt
+                </a>
+                <a href="mailto:?subject=SafeWheels Parking Receipt&body=Please find attached my parking receipt from SafeWheels." class="btn-print">
+                    <i class="fas fa-envelope"></i>
+                    Email Receipt
+                </a>
+            </div>
+
+            <a href="{{ url_for('user_home', user_id=bill.user_id) }}" class="btn-back">
+                <i class="fas fa-arrow-left"></i>
+                Return to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-hide flash messages after 5 seconds
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.style.animation = 'slideInRight 0.5s ease-out reverse';
+                setTimeout(() => {
+                    alert.remove();
+                }, 500);
+            }, 5000);
+        });
+
+        // Add animation delay to sections
+        const sections = document.querySelectorAll('.bill-section');
+        sections.forEach((section, index) => {
+            section.style.animationDelay = `${index * 0.1}s`;
+            section.style.animation = 'fadeInUp 0.6s ease-out forwards';
+        });
+    });
+    </script>
+</body>
+</html>

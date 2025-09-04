@@ -1,0 +1,658 @@
+{% extends 'AdminNav.html' %}
+
+{% block title %}SafeWheels - Admin Dashboard{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    :root {
+        --luxury-gold: #D4AF37;
+        --luxury-dark: #1a1a1a;
+        --luxury-charcoal: #2c2c2c;
+        --luxury-silver: #c0c0c0;
+        --luxury-white: #ffffff;
+        --luxury-cream: #f8f6f0;
+        --accent-blue: #0066cc;
+        --shadow-light: rgba(212, 175, 55, 0.1);
+        --shadow-dark: rgba(0, 0, 0, 0.3);
+        --gradient-primary: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+        --gradient-gold: linear-gradient(135deg, #D4AF37 0%, #B8941F 100%);
+        --success-green: #10B981;
+        --danger-red: #EF4444;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: var(--luxury-cream);
+        color: var(--luxury-dark);
+        line-height: 1.6;
+    }
+
+    /* Animated Background */
+    .content-wrapper {
+        min-height: calc(100vh - 80px);
+        background: var(--luxury-cream);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .content-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="%23D4AF37" stroke-width="0.3" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        animation: gridMove 30s linear infinite;
+        z-index: 0;
+    }
+
+    @keyframes gridMove {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(20px, 20px); }
+    }
+
+    /* Dashboard Header */
+    .dashboard-header {
+        background: var(--gradient-primary);
+        color: var(--luxury-white);
+        padding: 4rem 2rem;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%231a1a1a"/><g fill="%23D4AF37" opacity="0.08"><polygon points="0,600 300,400 600,500 900,300 1200,400 1200,600"/></g></svg>');
+        background-size: cover;
+        background-position: center;
+        opacity: 0.3;
+        z-index: 0;
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 1;
+        max-width: 1200px;
+        margin: 0 auto;
+        text-align: center;
+        animation: slideInDown 1s ease-out;
+    }
+
+    @keyframes slideInDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dashboard-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 3rem;
+        margin: 0 0 1rem 0;
+        background: var(--gradient-gold);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 2px 2px 4px var(--shadow-dark);
+    }
+
+    .dashboard-subtitle {
+        font-size: 1.2rem;
+        color: var(--luxury-silver);
+        font-weight: 300;
+        margin: 0;
+    }
+
+    /* Search Section */
+    .search-section {
+        background: var(--luxury-white);
+        border-radius: 20px;
+        padding: 2rem;
+        margin: -2rem 2rem 3rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), 0 8px 25px var(--shadow-light);
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+        border: 1px solid rgba(212, 175, 55, 0.1);
+        animation: slideInUp 1s ease-out 0.3s both;
+    }
+
+    @keyframes slideInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .search-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-gold);
+        border-radius: 20px 20px 0 0;
+    }
+
+    .search-form {
+        flex: 1;
+        display: flex;
+        gap: 1.5rem;
+        align-items: center;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 1rem 1.5rem;
+        border: 2px solid #e8e8e8;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-family: 'Inter', sans-serif;
+        color: var(--luxury-dark);
+        background: var(--luxury-white);
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--luxury-gold);
+        box-shadow: 0 0 0 4px var(--shadow-light);
+        transform: translateY(-2px);
+    }
+
+    .search-input::placeholder {
+        color: #aaa;
+        font-weight: 300;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary {
+        background: var(--gradient-gold);
+        color: var(--luxury-dark);
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+    }
+
+    .btn-add {
+        background: linear-gradient(135deg, var(--success-green) 0%, #0d9488 100%);
+        color: var(--luxury-white);
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+    }
+
+    /* Table Container */
+    .table-container {
+        margin: 0 2rem 3rem;
+        background: var(--luxury-white);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), 0 8px 25px var(--shadow-light);
+        overflow: hidden;
+        position: relative;
+        z-index: 1;
+        border: 1px solid rgba(212, 175, 55, 0.1);
+        animation: slideInUp 1s ease-out 0.6s both;
+    }
+
+    .table-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-gold);
+        border-radius: 20px 20px 0 0;
+    }
+
+    .table-header {
+        padding: 2rem;
+        border-bottom: 2px solid rgba(212, 175, 55, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(135deg, rgba(248, 246, 240, 0.5) 0%, rgba(255, 255, 255, 0.8) 100%);
+    }
+
+    .table-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--luxury-dark);
+        margin: 0;
+        position: relative;
+    }
+
+    .table-title::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: var(--gradient-gold);
+        border-radius: 2px;
+    }
+
+    /* Table Styles */
+    .parking-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .parking-table th {
+        background: linear-gradient(135deg, var(--luxury-charcoal) 0%, var(--luxury-dark) 100%);
+        padding: 1.5rem;
+        text-align: left;
+        color: var(--luxury-white);
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+    }
+
+    .parking-table th::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: var(--gradient-gold);
+    }
+
+    .parking-table td {
+        padding: 1.5rem;
+        border-top: 1px solid rgba(212, 175, 55, 0.1);
+        color: var(--luxury-dark);
+        font-weight: 400;
+        transition: all 0.3s ease;
+    }
+
+    .parking-table tr {
+        transition: all 0.3s ease;
+    }
+
+    .parking-table tbody tr:hover {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(248, 246, 240, 0.8) 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1);
+    }
+
+    .status-available {
+        color: var(--success-green);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .status-available::before {
+        content: '●';
+        color: var(--success-green);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    .btn-info {
+        padding: 0.8rem 1.5rem;
+        background: var(--gradient-gold);
+        color: var(--luxury-dark);
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-info:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        background: linear-gradient(135deg, #B8941F 0%, var(--luxury-gold) 100%);
+    }
+
+    .btn-info::after {
+        content: '→';
+        transition: transform 0.3s ease;
+    }
+
+    .btn-info:hover::after {
+        transform: translateX(3px);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--luxury-silver);
+        background: linear-gradient(135deg, rgba(248, 246, 240, 0.5) 0%, rgba(255, 255, 255, 0.8) 100%);
+    }
+
+    .empty-state::before {
+        content: '🚗';
+        display: block;
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
+    }
+
+    .empty-state p {
+        font-size: 1.2rem;
+        font-weight: 300;
+        margin: 0;
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin: 0 2rem 3rem;
+        z-index: 1;
+        position: relative;
+    }
+
+    .stat-card {
+        background: var(--luxury-white);
+        padding: 2rem;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(212, 175, 55, 0.1);
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-gold);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-number {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--luxury-gold);
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: var(--luxury-charcoal);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .dashboard-title {
+            font-size: 2.5rem;
+        }
+        
+        .search-section,
+        .table-container {
+            margin-left: 1rem;
+            margin-right: 1rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 3rem 1rem;
+        }
+        
+        .dashboard-title {
+            font-size: 2rem;
+        }
+        
+        .search-section {
+            flex-direction: column;
+            padding: 1.5rem;
+            margin: -1.5rem 1rem 2rem;
+        }
+
+        .search-form {
+            flex-direction: column;
+            width: 100%;
+            gap: 1rem;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 0 1rem 2rem;
+        }
+
+        .parking-table {
+            font-size: 0.875rem;
+            min-width: 800px;
+        }
+        
+        .parking-table th,
+        .parking-table td {
+            padding: 1rem;
+        }
+        
+        .stats-grid {
+            margin: 0 1rem 2rem;
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Loading Animation */
+    .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(26, 26, 26, 0.3);
+        border-radius: 50%;
+        border-top-color: var(--luxury-gold);
+        animation: spin 1s ease-in-out infinite;
+        margin-left: 10px;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="dashboard-header">
+        <div class="header-content">
+            <h1 class="dashboard-title">Admin Dashboard</h1>
+            <p class="dashboard-subtitle">Manage premium parking facilities with excellence</p>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ parklots|length if parklots else 0 }}</div>
+            <div class="stat-label">Total Parking Lots</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ parklots|sum(attribute='capacity') if parklots else 0 }}</div>
+            <div class="stat-label">Total Capacity</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ parklots|sum(attribute='available') if parklots else 0 }}</div>
+            <div class="stat-label">Available Spaces</div>
+        </div>
+    </div>
+
+    <div class="search-section">
+        <form class="search-form" action="{{ url_for('admin_home') }}" method="POST">
+            <input type="text" id="search" name="search" class="search-input"
+                   placeholder="Search parking lots by name, location, or PIN code...">
+                    
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i>
+                Search
+            </button>
+        </form>
+        <a href="{{ url_for('add_parking_lot') }}" class="btn btn-add">
+            <i class="fas fa-plus"></i>
+            Add New Parking Lot
+        </a>
+    </div>
+
+    <div class="table-container">
+        <div class="table-header">
+            <h2 class="table-title">Parking Lots Overview</h2>
+        </div>
+
+        {% if not parklots %}
+            <div class="empty-state">
+                <p>No parking lots available. Start by adding your first premium parking facility.</p>
+            </div>
+        {% else %}
+            <table class="parking-table">
+                <thead>
+                    <tr>
+                        <th>Lot Name</th>
+                        <th>PIN Code</th>
+                        <th>Location</th>
+                        <th>Price/min</th>
+                        <th>Capacity</th>
+                        <th>Available</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for parklot in parklots %}
+                    <tr>
+                        <td><strong>{{ parklot.name }}</strong></td>
+                        <td>{{ parklot.pin }}</td>
+                        <td>{{ parklot.address }}</td>
+                        <td><strong>₹{{ parklot.price }}</strong></td>
+                        <td>{{ parklot.capacity }}</td>
+                        <td class="status-available">{{ parklot.available }}</td>
+                        <td>
+                            <a href="{{ url_for('parkinglot', parklot_id=parklot.parklot_id) }}" 
+                               class="btn-info">View Details</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Add loading animation on form submit
+    document.querySelector('.search-form').addEventListener('submit', function() {
+        const btn = this.querySelector('.btn-primary');
+        const icon = btn.querySelector('i');
+        icon.className = 'loading';
+        btn.disabled = true;
+    });
+
+    // Add smooth scroll to table when searching
+    const searchInput = document.getElementById('search');
+    searchInput.addEventListener('focus', function() {
+        this.style.transform = 'translateY(-2px)';
+    });
+    
+    searchInput.addEventListener('blur', function() {
+        this.style.transform = 'translateY(0)';
+    });
+
+    // Animate table rows on load
+    const tableRows = document.querySelectorAll('.parking-table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.opacity = '0';
+        row.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            row.style.transition = 'all 0.5s ease';
+            row.style.opacity = '1';
+            row.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+</script>
+{% endblock %}

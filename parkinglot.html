@@ -1,0 +1,685 @@
+{% extends 'AdminNav.html' %}
+
+{% block title %}Parking Lot Details - SafeWheels.com{% endblock %}
+
+{% block styles %}
+{{ super() }}
+
+<style>
+    :root {
+        --luxury-gold: #D4AF37;
+        --luxury-gold-light: #F4E4BC;
+        --luxury-gold-dark: #B8941F;
+        --luxury-dark: #1a1a1a;
+        --luxury-dark-light: #2c2c2c;
+        --luxury-dark-lighter: #3a3a3a;
+        --luxury-white: #ffffff;
+        --luxury-gray: #f8f9fa;
+        --luxury-gray-dark: #6c757d;
+        --luxury-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        --luxury-shadow-hover: 0 12px 48px rgba(0, 0, 0, 0.18);
+        --luxury-gradient: linear-gradient(135deg, var(--luxury-gold) 0%, var(--luxury-gold-dark) 100%);
+        --luxury-gradient-dark: linear-gradient(135deg, var(--luxury-dark) 0%, var(--luxury-dark-light) 100%);
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: var(--luxury-gray);
+        color: var(--luxury-dark);
+        line-height: 1.6;
+    }
+
+    .dashboard-header {
+        position: relative;
+        text-align: center;
+        padding: 3rem 2rem;
+        background: var(--luxury-gradient-dark);
+        color: var(--luxury-white);
+        border-radius: 0 0 24px 24px;
+        box-shadow: var(--luxury-shadow);
+        overflow: hidden;
+    }
+
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23D4AF37" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="%23D4AF37" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="%23D4AF37" opacity="0.15"/><circle cx="10" cy="60" r="0.8" fill="%23D4AF37" opacity="0.1"/><circle cx="90" cy="40" r="0.6" fill="%23D4AF37" opacity="0.12"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .dashboard-title {
+        font-size: 3rem;
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        margin: 0;
+        background: var(--luxury-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .dashboard-title::before {
+        content: '\f3c5';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: var(--luxury-gold);
+        -webkit-text-fill-color: var(--luxury-gold);
+        font-size: 2.5rem;
+    }
+
+    .dashboard-subtitle {
+        font-size: 1.2rem;
+        color: var(--luxury-gold-light);
+        margin-top: 0.5rem;
+        font-weight: 300;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .dashboard-subtitle::before {
+        content: '\f3c5';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: var(--luxury-gold);
+        font-size: 1rem;
+    }
+
+    .content-wrapper {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .lot-details, .search-section {
+        background: var(--luxury-white);
+        border-radius: 16px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--luxury-shadow);
+        border-top: 4px solid var(--luxury-gold);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .lot-details:hover, .search-section:hover {
+        box-shadow: var(--luxury-shadow-hover);
+        transform: translateY(-2px);
+    }
+
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--luxury-dark);
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .section-title.lot-title::before {
+        content: '\f013';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: var(--luxury-gold);
+        font-size: 1.5rem;
+    }
+
+    .section-title.search-title::before {
+        content: '\f002';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: var(--luxury-gold);
+        font-size: 1.5rem;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        color: var(--luxury-dark);
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-label.name-label::before {
+        content: '\f1ad';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: var(--luxury-gold);
+    }
+
+    .form-label.pin-label::before {
+        content: '\f3c5';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: var(--luxury-gold);
+    }
+
+    .form-label.address-label::before {
+        content: '\f041';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: var(--luxury-gold);
+    }
+
+    .form-label.price-label::before {
+        content: '\f156';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: var(--luxury-gold);
+    }
+
+    .form-label.capacity-label::before {
+        content: '\f1b9';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: var(--luxury-gold);
+    }
+
+    .form-label.available-label::before {
+        content: '\f058';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: var(--luxury-gold);
+    }
+
+    .form-label.search-label::before {
+        content: '\f002';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: var(--luxury-gold);
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 1rem 1.25rem;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        font-size: 1rem;
+        color: var(--luxury-dark);
+        background: var(--luxury-white);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: 'Inter', sans-serif;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--luxury-gold);
+        box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .form-input:hover:not(:focus) {
+        border-color: var(--luxury-gold-light);
+    }
+
+    .form-input[readonly] {
+        background: #f8f9fa;
+        color: var(--luxury-gray-dark);
+        cursor: not-allowed;
+    }
+
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 2rem;
+        background: var(--luxury-gradient);
+        color: var(--luxury-white);
+        border: none;
+        border-radius: 12px;
+        font-family: 'Inter', sans-serif;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, var(--luxury-gold-dark) 0%, var(--luxury-gold) 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+    }
+
+    .btn-primary.update-btn::after {
+        content: '\f021';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+    }
+
+    .btn-primary.search-btn::after {
+        content: '\f002';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+    }
+
+    .delete-option {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #fff5f5 0%, #fef2f2 100%);
+        border-radius: 12px;
+        border: 1px solid #fecaca;
+    }
+
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+        width: 1.2rem;
+        height: 1.2rem;
+        accent-color: #ef4444;
+        cursor: pointer;
+    }
+
+    .checkbox-group label {
+        color: #dc2626;
+        font-weight: 600;
+        margin: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .checkbox-group label::before {
+        content: '\f071';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: #ef4444;
+    }
+
+    .spots-table {
+        background: var(--luxury-white);
+        border-radius: 16px;
+        padding: 2.5rem;
+        box-shadow: var(--luxury-shadow);
+        border-top: 4px solid var(--luxury-gold);
+        animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    .table-header {
+        margin-bottom: 2rem;
+    }
+
+    .table-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--luxury-dark);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin: 0;
+    }
+
+    .table-title::before {
+        content: '\f0ce';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: var(--luxury-gold);
+        font-size: 1.5rem;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'Inter', sans-serif;
+        background: var(--luxury-white);
+    }
+
+    th {
+        background: var(--luxury-gradient);
+        color: var(--luxury-white);
+        padding: 1.25rem 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: none;
+        position: relative;
+    }
+
+    th:first-child {
+        border-radius: 12px 0 0 0;
+    }
+
+    th:last-child {
+        border-radius: 0 12px 0 0;
+    }
+
+    td {
+        padding: 1rem;
+        border-bottom: 1px solid #f1f3f4;
+        font-size: 0.95rem;
+        color: var(--luxury-dark);
+        transition: background-color 0.2s ease;
+    }
+
+    tr:hover td {
+        background-color: #fafbfc;
+    }
+
+    tr:last-child td:first-child {
+        border-radius: 0 0 0 12px;
+    }
+
+    tr:last-child td:last-child {
+        border-radius: 0 0 12px 0;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        border-radius: 20px;
+        font-weight: 600;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-available {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    .status-available::before {
+        content: '\f058';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+    }
+
+    .status-booked {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    }
+
+    .status-booked::before {
+        content: '\f057';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 2rem 1rem;
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .content-wrapper {
+            padding: 0 0.5rem;
+        }
+
+        .lot-details, .search-section, .spots-table {
+            padding: 1.5rem;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .table-container {
+            font-size: 0.875rem;
+        }
+
+        th, td {
+            padding: 0.75rem 0.5rem;
+        }
+
+        .btn-primary {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .dashboard-title {
+            font-size: 1.75rem;
+        }
+
+        .lot-details, .search-section, .spots-table {
+            padding: 1rem;
+        }
+
+        .form-input {
+            padding: 0.875rem 1rem;
+        }
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div class="header-content">
+        <h1 class="dashboard-title">{{ parklot.name }}</h1>
+        <p class="dashboard-subtitle">{{ parklot.address }}</p>
+    </div>
+</div>
+
+<div class="content-wrapper">
+    <div class="lot-details">
+        <h2 class="section-title lot-title">Parking Lot Management</h2>
+        <form action="{{url_for('add_parking_lot')}}" method="POST">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label name-label" for="name">Lot Name</label>
+                    <input class="form-input" type="text" id="name" name="name" 
+                           value="{{ parklot.name }}" required readonly>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label pin-label" for="pin">PIN Code</label>
+                    <input class="form-input" type="text" id="pin" name="pin" 
+                           value="{{ parklot.pin }}" required readonly>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label address-label" for="address">Address</label>
+                    <input class="form-input" type="text" id="address" name="address" 
+                           value="{{ parklot.address }}" required readonly>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label price-label" for="price">Price per Second</label>
+                    <input class="form-input" type="number" id="price" name="price" 
+                           value="{{ parklot.price }}" step="0.01" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label capacity-label" for="capacity">Total Capacity</label>
+                    <input class="form-input" type="number" id="capacity" name="capacity" 
+                           value="{{ parklot.capacity }}" required readonly>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label available-label" for="available">Total Available</label>
+                    <input class="form-input" type="number" id="available" name="available" 
+                           value="{{ parklot.available }}" min="1" required>
+                </div>
+            </div>
+
+            <div class="delete-option">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="delete" name="delete" value="delete">
+                    <label for="delete">Delete Parking Lot</label>
+                </div>
+            </div>
+
+            <div style="margin-top: 2rem;">
+                <button type="submit" class="btn-primary update-btn">Update Parking Lot</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="search-section">
+        <h2 class="section-title search-title">Search Parking Spots</h2>
+        <form action="{{url_for('parkinglot', parklot_id=parklot.parklot_id)}}" method="POST">
+            <div class="form-group">
+                <label class="form-label search-label" for="search">Spot ID</label>
+                <input class="form-input" type="text" id="search" name="search" placeholder="Enter Spot ID to search">
+            </div>
+            <div style="margin-top: 1.5rem;">
+                <button type="submit" class="btn-primary search-btn">Search Spot</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="spots-table">
+        <div class="table-header">
+            <h2 class="table-title">Parking Spots Status</h2>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Spot ID</th>
+                        <th>Status</th>
+                        <th>Booked By</th>
+                        <th>Vehicle Number</th>
+                        <th>Phone Number</th>
+                        <th>Gender</th>
+                    </tr>
+                </thead>
+                {% if spot %}
+                <tbody>
+                    <tr>
+                        <td>{{ spot.parkingspot_id }}</td>
+                        <td>
+                            <span class="status-badge status-{{ 'available' if spot.status == 0 else 'booked' }}">
+                                {{ 'Available' if spot.status == 0 else 'Booked' }}
+                            </span>
+                        </td>
+                        <td>{{ Bill.query.filter_by(parkingspot_id=spot.parkingspot_id,settled=0).first().user.name if spot.status==1 else '-' }}</td>
+                        <td>{{ (Bill.query.filter_by(parkingspot_id=spot.parkingspot_id,settled=0)).first().vehicle_number if spot.status==1 else '-' }}</td>
+                        <td>{{ (Bill.query.filter_by(parkingspot_id=spot.parkingspot_id,settled=0)).first().user.phone if spot.status==1 else '-' }}</td>
+                        <td>{{ (Bill.query.filter_by(parkingspot_id=spot.parkingspot_id,settled=0)).first().user.gender if spot.status==1 else '-' }}</td>
+                    </tr>
+                </tbody>
+                {% else %}
+                    <tbody>
+                    {% for spot in spotsb  %}
+                    <tr>
+                        <td>{{ spot.parkingspot_id }}</td>
+                        <td>
+                            <span class="status-badge status-booked">
+                                Booked
+                            </span>
+                        </td>
+                        <td>{{ (Bill.query.filter_by(parkingspot_id=spot.parkingspot_id,settled=0)).first().user.name  }}</td>
+                        <td>{{ (Bill.query.filter_by(parkingspot_id=spot.parkingspot_id,settled=0)).first().vehicle_number }}</td>
+                        <td>{{ (Bill.query.filter_by(parkingspot_id=spot.parkingspot_id,settled=0)).first().user.phone }}</td>
+                        <td>{{ (Bill.query.filter_by(parkingspot_id=spot.parkingspot_id,settled=0)).first().user.gender }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                  <tbody>
+                     {% for spot in spotsa %}
+                     <tr>
+                        <td>{{ spot.parkingspot_id}}</td>
+                        <td>
+                            <span class="status-badge status-available">
+                                Available
+                            </span>
+                        </td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                     </tr>
+                      {% endfor %}
+                    </tbody>
+                    {% endif %}
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

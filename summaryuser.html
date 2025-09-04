@@ -1,0 +1,509 @@
+{% extends 'NavUser.html' %}
+
+{% block title %}Summary Dashboard - SafeWheels{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    .content-wrapper {
+        min-height: calc(100vh - 200px);
+        padding: 2rem;
+        background: var(--luxury-cream);
+    }
+
+    .dashboard-header {
+        background: var(--dark-gradient);
+        color: var(--luxury-white);
+        padding: 3rem 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+    }
+
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 30% 70%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 70% 30%, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+        z-index: 0;
+    }
+
+    .dashboard-header::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gold-gradient);
+        z-index: 1;
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 2;
+        max-width: 1400px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .dashboard-title {
+        font-family: var(--font-primary);
+        font-weight: 700;
+        font-size: 2.5rem;
+        margin: 0 0 1rem 0;
+        background: var(--gold-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .dashboard-title i {
+        color: var(--luxury-gold);
+        font-size: 2rem;
+    }
+
+    .dashboard-subtitle {
+        margin: 0;
+        font-size: 1.2rem;
+        font-family: var(--font-secondary);
+        color: var(--luxury-silver);
+    }
+
+    .stats-container {
+        max-width: 1400px;
+        margin: 0 auto 2rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .stat-card {
+        background: var(--luxury-white);
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: var(--shadow-dark);
+        border: 1px solid rgba(212, 175, 55, 0.1);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-gold);
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gold-gradient);
+    }
+
+    .stat-icon {
+        font-size: 3rem;
+        color: var(--luxury-gold);
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .stat-label {
+        color: var(--luxury-charcoal);
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0 0 1rem 0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-family: var(--font-secondary);
+    }
+
+    .stat-value {
+        font-family: var(--font-primary);
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--luxury-dark);
+        margin: 0;
+        background: var(--gold-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .graphs-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 2rem;
+    }
+
+    .graph-card {
+        background: var(--luxury-white);
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: var(--shadow-dark);
+        border: 1px solid rgba(212, 175, 55, 0.1);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .graph-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-gold);
+    }
+
+    .graph-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gold-gradient);
+    }
+
+    .graph-title {
+        font-family: var(--font-primary);
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--luxury-dark);
+        margin: 0 0 2rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .graph-title i {
+        color: var(--luxury-gold);
+        font-size: 1.5rem;
+    }
+
+    .graph-image {
+        width: 100%;
+        height: auto;
+        border-radius: 16px;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .graph-image:hover {
+        transform: scale(1.02);
+        box-shadow: 0 12px 48px rgba(212, 175, 55, 0.2);
+    }
+
+    .graph-description {
+        color: var(--luxury-charcoal);
+        font-size: 1.1rem;
+        margin: 0;
+        font-family: var(--font-secondary);
+        font-style: italic;
+        text-align: center;
+    }
+
+    .insights-section {
+        max-width: 1400px;
+        margin: 3rem auto 0;
+        background: var(--luxury-charcoal);
+        color: var(--luxury-white);
+        border-radius: 20px;
+        padding: 2.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .insights-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gold-gradient);
+    }
+
+    .insights-title {
+        font-family: var(--font-primary);
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin: 0 0 1.5rem 0;
+        color: var(--luxury-gold);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .insights-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .insight-item {
+        background: rgba(212, 175, 55, 0.1);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        text-align: center;
+    }
+
+    .insight-label {
+        font-size: 0.9rem;
+        color: var(--luxury-silver);
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .insight-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--luxury-gold);
+        font-family: var(--font-primary);
+    }
+
+    @media (max-width: 768px) {
+        .content-wrapper {
+            padding: 1rem;
+        }
+
+        .dashboard-header {
+            padding: 2rem 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-title {
+            font-size: 2rem;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .stats-container {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .stat-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+        }
+
+        .graphs-container {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .graph-card {
+            padding: 1.5rem;
+        }
+
+        .graph-title {
+            font-size: 1.5rem;
+        }
+
+        .insights-section {
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .insights-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="dashboard-header">
+        <div class="header-content">
+            <h1 class="dashboard-title">
+                <i class="fas fa-chart-pie"></i>
+                Summary Dashboard
+            </h1>
+            <p class="dashboard-subtitle">Track your parking activity and spending with SafeWheels analytics</p>
+        </div>
+    </div>
+
+    <div class="stats-container">
+        <div class="stat-card">
+            <i class="fas fa-calendar-check stat-icon"></i>
+            <div class="stat-label">Total Bookings</div>
+            <div class="stat-value" data-target="{{ totalbookings }}">0</div>
+        </div>
+        <div class="stat-card">
+            <i class="fas fa-rupee-sign stat-icon"></i>
+            <div class="stat-label">Total Amount Spent</div>
+            <div class="stat-value" data-target="{{ totalspent }}" data-prefix="₹">₹0.00</div>
+        </div>
+    </div>
+
+    <div class="graphs-container">
+        <div class="graph-card">
+            <h3 class="graph-title">
+                <i class="fas fa-map-marker-alt"></i>
+                Visits per Parking Lot
+            </h3>
+            <img class="graph-image" src="/visitperlot.png/" alt="Visits per parking lot graph">
+            <p class="graph-description">Your parking preferences and most visited locations</p>
+        </div>
+        <div class="graph-card">
+            <h3 class="graph-title">
+                <i class="fas fa-wallet"></i>
+                Spending per Parking Lot
+            </h3>
+            <img class="graph-image" src="/spentperlot.png/" alt="Spending per parking lot graph">
+            <p class="graph-description">Cost analysis across different parking facilities</p>
+        </div>
+    </div>
+
+    <div class="insights-section">
+        <h3 class="insights-title">
+            <i class="fas fa-lightbulb"></i>
+            Parking Insights
+        </h3>
+        <div class="insights-grid">
+            <div class="insight-item">
+                <div class="insight-label">Average Cost per Visit</div>
+                <div class="insight-value" data-target="{{ totalspent / totalbookings if totalbookings > 0 else 0 }}" data-prefix="₹">₹0.00</div>
+            </div>
+            <div class="insight-item">
+                <div class="insight-label">Most Active Month</div>
+                <div class="insight-value">Current</div>
+            </div>
+            <div class="insight-item">
+                <div class="insight-label">Savings Potential</div>
+                <div class="insight-value">15%</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Animated Number Counter Function
+function animateNumber(element, target, duration = 2500, prefix = '', suffix = '') {
+    const start = 0;
+    const increment = target / (duration / 16); // 60 FPS
+    let current = start;
+    
+    const timer = setInterval(() => {
+        current += increment;
+        
+        if (current >= target) {
+            current = target;
+            clearInterval(timer);
+        }
+        
+        // Format number based on type
+        let displayValue;
+        if (prefix === '₹') {
+            // Format currency with commas and 2 decimal places
+            displayValue = prefix + current.toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        } else if (suffix === '%') {
+            // Format percentage with 1 decimal place
+            displayValue = current.toFixed(1) + suffix;
+        } else {
+            // Format regular numbers with commas
+            displayValue = Math.floor(current).toLocaleString('en-IN') + suffix;
+        }
+        
+        element.textContent = displayValue;
+    }, 16);
+}
+
+// Intersection Observer for triggering animations when elements come into view
+const observerOptions = {
+    threshold: 0.3,
+    rootMargin: '0px 0px -20px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting && !entry.target.classList.contains('animated')) {
+            entry.target.classList.add('animated');
+            
+            const target = parseFloat(entry.target.dataset.target);
+            const prefix = entry.target.dataset.prefix || '';
+            const suffix = entry.target.dataset.suffix || '';
+            
+            // Add a slight delay for staggered animation effect
+            const delay = Array.from(entry.target.parentElement.parentElement.children).indexOf(entry.target.parentElement) * 200;
+            
+            setTimeout(() => {
+                animateNumber(entry.target, target, 2000, prefix, suffix);
+            }, delay);
+        }
+    });
+}, observerOptions);
+
+// Initialize animations when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Add CSS animation classes
+    const style = document.createElement('style');
+    style.textContent = `
+        .stat-card, .graph-card {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+        
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.3s; }
+        
+        .graph-card:nth-child(1) { animation-delay: 0.5s; }
+        .graph-card:nth-child(2) { animation-delay: 0.7s; }
+        
+        .insights-section {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease forwards;
+            animation-delay: 0.9s;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stat-value, .insight-value {
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Observe all elements with data-target attribute
+    const animatedElements = document.querySelectorAll('[data-target]');
+    animatedElements.forEach(element => {
+        observer.observe(element);
+    });
+});
+</script>
+{% endblock %}
